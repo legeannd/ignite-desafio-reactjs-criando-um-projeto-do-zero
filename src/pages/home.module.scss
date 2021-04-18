@@ -1,11 +1,56 @@
 .container {
+  max-width: 1120px;
+  display: flex;
+  height: calc(100vh - 10rem);
+  margin: 0 auto;
 
 }
 
 .posts {
+  width: 100%;
+}
 
+.singlePost {
+
+  a {
+    transition: filter 0.2s;
+
+    &:hover {
+      filter: brightness(0.8);
+    }
+  }
+
+  & + div {
+    margin-top: 3rem;
+  }
+
+  strong {
+    font-size: 1.75rem;
+    font-weight: bold;
+  }
+
+  p {
+    margin-top: 0.5rem;
+    font-size: 1.125rem;
+    color: var(--body);
+  }
 }
 
 .iconsContainer {
+  margin-top: 1.5rem;
 
+  display: flex;
+
+  div {
+    margin-right: 1.5rem;
+    font-size: 0.875rem;
+    display: flex;
+  }
+
+  svg {
+    margin-right: 0.5rem;
+    width: 20px;
+    height: 20px;
+    color: var(--info);
+  }
 }
