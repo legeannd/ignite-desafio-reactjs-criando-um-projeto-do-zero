@@ -84,6 +84,13 @@ export default function Home() {
               </div>
             </div>
           </div>
+          <div className={styles.loadPosts}>
+            <Link href="/">
+              <a>
+                <span>Carregar mais posts</span>
+              </a>
+            </Link>
+          </div>
         </div>
       </main>
     </>

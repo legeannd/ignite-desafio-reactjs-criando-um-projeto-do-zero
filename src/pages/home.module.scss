@@ -20,7 +20,7 @@
     }
   }
 
-  & + div {
+  & + div:not(.loadPosts) {
     margin-top: 3rem;
   }
 
@@ -33,6 +33,21 @@
     margin-top: 0.5rem;
     font-size: 1.125rem;
     color: var(--body);
+  }
+}
+
+.loadPosts {
+  margin-top: 4rem;
+  margin-bottom: 5rem;
+  font-size: 1.125rem;
+  color: var(--highlight);
+
+  a {
+    transition: filter 0.2s;
+
+    &:hover {
+      filter: brightness(0.8);
+    }
   }
 }
 
