@@ -1,8 +1,10 @@
 import { GetStaticProps } from 'next';
 import Head from 'next/head';
 import Link from 'next/link';
+import Prismic from '@prismicio/client';
 import { FiCalendar, FiUser } from 'react-icons/fi';
 
+import { useState } from 'react';
 import { getPrismicClient } from '../services/prismic';
 
 import commonStyles from '../styles/common.module.scss';
@@ -27,7 +29,9 @@ interface HomeProps {
   postsPagination: PostPagination;
 }
 
-export default function Home() {
+export default function Home({ postsPagination }: HomeProps) {
+  const [posts, setPosts] = useState<Post[]>(postsPagination.results);
+
   return (
     <>
       <Head>
@@ -35,71 +39,78 @@ export default function Home() {
       </Head>
 
       <main className={styles.container}>
-        <div className={styles.posts}>
+        {posts.length === 0 ? (
           <div className={styles.singlePost}>
-            <Link href="/">
-              <a>
-                <strong>Como utilizar Hooks</strong>
-              </a>
-            </Link>
-            <p>Pensando em sincronização em vez de ciclos de vida.</p>
-            <div className={styles.iconsContainer}>
-              <div>
-                <FiCalendar /> <span>15 Mar 2021</span>
+            <strong>Nenhum post disponível!</strong>
+          </div>
+        ) : (
+          <div className={styles.posts}>
+            {posts.map(post => (
+              <div className={styles.singlePost}>
+                <Link href={`/post/${post.uid}`}>
+                  <a>
+                    <strong>{post.data.title}</strong>
+                  </a>
+                </Link>
+                <p>{post.data.subtitle}</p>
+                <div className={styles.iconsContainer}>
+                  <div>
+                    <FiCalendar /> <span>{post.first_publication_date}</span>
+                  </div>
+                  <div>
+                    <FiUser /> <span>{post.data.author}</span>
+                  </div>
+                </div>
               </div>
-              <div>
-                <FiUser /> <span>Gean Lucas</span>
-              </div>
+            ))}
+            <div className={styles.loadPosts}>
+              <Link href="/">
+                <a>
+                  <span>Carregar mais posts</span>
+                </a>
+              </Link>
             </div>
           </div>
-          <div className={styles.singlePost}>
-            <Link href="/">
-              <a>
-                <strong>Como utilizar Hooks</strong>
-              </a>
-            </Link>
-            <p>Pensando em sincronização em vez de ciclos de vida.</p>
-            <div className={styles.iconsContainer}>
-              <div>
-                <FiCalendar /> <span>15 Mar 2021</span>
-              </div>
-              <div>
-                <FiUser /> <span>Gean Lucas</span>
-              </div>
-            </div>
-          </div>
-          <div className={styles.singlePost}>
-            <Link href="/">
-              <a>
-                <strong>Como utilizar Hooks</strong>
-              </a>
-            </Link>
-            <p>Pensando em sincronização em vez de ciclos de vida.</p>
-            <div className={styles.iconsContainer}>
-              <div>
-                <FiCalendar /> <span>15 Mar 2021</span>
-              </div>
-              <div>
-                <FiUser /> <span>Gean Lucas</span>
-              </div>
-            </div>
-          </div>
-          <div className={styles.loadPosts}>
-            <Link href="/">
-              <a>
-                <span>Carregar mais posts</span>
-              </a>
-            </Link>
-          </div>
-        </div>
+        )}
       </main>
     </>
   );
 }
 
-// export const getStaticProps = async () => {
-//   // const prismic = getPrismicClient();
-//   // const postsResponse = await prismic.query(TODO);
+export const getStaticProps: GetStaticProps = async () => {
+  const prismic = getPrismicClient();
+  const postsResponse = await prismic.query(
+    [Prismic.predicates.at('document.type', 'post')],
+    {
+      pageSize: 2,
+      orderings: '[document.last_publication_date desc]',
+    }
+  );
 
-//   // TODO
-// };
+  const results = postsResponse.results.map(post => {
+    return {
+      uid: post.uid,
+      first_publication_date: new Date(
+        post.first_publication_date
+      ).toLocaleDateString('pt-BR', {
+        day: '2-digit',
+        month: 'long',
+        year: 'numeric',
+      }),
+      data: {
+        title: post.data.title,
+        subtitle: post.data.subtitle,
+        author: post.data.author,
+      },
+    };
+  });
+
+  return {
+    props: {
+      postsPagination: {
+        next_page: postsResponse.next_page,
+        results,
+      },
+    },
+  };
+};
