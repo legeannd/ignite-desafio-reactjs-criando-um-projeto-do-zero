@@ -40,9 +40,11 @@
   margin-top: 4rem;
   margin-bottom: 5rem;
   font-size: 1.125rem;
-  color: var(--highlight);
 
-  a {
+  button {
+    color: var(--highlight);
+    border: none;
+    background: transparent;
     transition: filter 0.2s;
 
     &:hover {

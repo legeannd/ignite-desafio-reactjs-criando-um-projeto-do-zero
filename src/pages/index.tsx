@@ -4,7 +4,9 @@ import Link from 'next/link';
 import Prismic from '@prismicio/client';
 import { FiCalendar, FiUser } from 'react-icons/fi';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { ptBR } from 'date-fns/locale';
+import { format } from 'date-fns';
 import { getPrismicClient } from '../services/prismic';
 
 import commonStyles from '../styles/common.module.scss';
@@ -32,9 +34,50 @@ interface HomeProps {
 export default function Home({
   postsPagination,
 }: HomeProps): React.ReactElement {
-  const [posts, setPosts] = useState<Post[]>(postsPagination.results);
+  const [posts, setPosts] = useState<Post[]>();
+  const [nextPage, setNextPage] = useState(postsPagination.next_page);
   const [hasNext, setHasNext] = useState(postsPagination.next_page !== null);
-  console.log(postsPagination.next_page);
+
+  useEffect(() => {
+    const formattedPosts = postsPagination.results.map((post: Post) => ({
+      ...post,
+      first_publication_date: format(
+        new Date(post.first_publication_date),
+        'dd MMM yyyy',
+        {
+          locale: ptBR,
+        }
+      ),
+    }));
+
+    setPosts(formattedPosts);
+  }, [postsPagination.results]);
+
+  async function handleNextPage(): Promise<void> {
+    const response: PostPagination = await fetch(nextPage).then(results =>
+      results.json()
+    );
+
+    setNextPage(response.next_page);
+    setHasNext(response.next_page !== null);
+
+    const newPosts = response.results.map(
+      result =>
+        ({
+          data: result.data,
+          first_publication_date: format(
+            new Date(result.first_publication_date),
+            'dd MMM yyyy',
+            {
+              locale: ptBR,
+            }
+          ),
+          uid: result.uid,
+        } as Post)
+    );
+
+    setPosts([...posts, ...newPosts]);
+  }
 
   return (
     <>
@@ -43,7 +86,7 @@ export default function Home({
       </Head>
 
       <main className={styles.container}>
-        {posts.length === 0 ? (
+        {!posts ? (
           <div className={styles.singlePost}>
             <strong>Nenhum post disponível!</strong>
           </div>
@@ -69,11 +112,9 @@ export default function Home({
             ))}
             {hasNext && (
               <div className={styles.loadPosts}>
-                <Link href={postsPagination.next_page}>
-                  <a>
-                    <span>Carregar mais posts</span>
-                  </a>
-                </Link>
+                <button type="button" onClick={handleNextPage}>
+                  <span>Carregar mais posts</span>
+                </button>
               </div>
             )}
           </div>
@@ -88,7 +129,7 @@ export const getStaticProps: GetStaticProps = async () => {
   const postsResponse = await prismic.query(
     [Prismic.predicates.at('document.type', 'post')],
     {
-      pageSize: 3,
+      pageSize: 1,
       orderings: '[document.last_publication_date desc]',
     }
   );
@@ -96,13 +137,7 @@ export const getStaticProps: GetStaticProps = async () => {
   const results = postsResponse.results.map(post => {
     return {
       uid: post.uid,
-      first_publication_date: new Date(
-        post.first_publication_date
-      ).toLocaleDateString('pt-BR', {
-        day: '2-digit',
-        month: 'long',
-        year: 'numeric',
-      }),
+      first_publication_date: post.first_publication_date,
       data: {
         title: post.data.title,
         subtitle: post.data.subtitle,
