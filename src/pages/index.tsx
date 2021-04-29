@@ -29,8 +29,12 @@ interface HomeProps {
   postsPagination: PostPagination;
 }
 
-export default function Home({ postsPagination }: HomeProps) {
+export default function Home({
+  postsPagination,
+}: HomeProps): React.ReactElement {
   const [posts, setPosts] = useState<Post[]>(postsPagination.results);
+  const [hasNext, setHasNext] = useState(postsPagination.next_page !== null);
+  console.log(postsPagination.next_page);
 
   return (
     <>
@@ -46,7 +50,7 @@ export default function Home({ postsPagination }: HomeProps) {
         ) : (
           <div className={styles.posts}>
             {posts.map(post => (
-              <div className={styles.singlePost}>
+              <div key={post.uid} className={styles.singlePost}>
                 <Link href={`/post/${post.uid}`}>
                   <a>
                     <strong>{post.data.title}</strong>
@@ -63,13 +67,15 @@ export default function Home({ postsPagination }: HomeProps) {
                 </div>
               </div>
             ))}
-            <div className={styles.loadPosts}>
-              <Link href="/">
-                <a>
-                  <span>Carregar mais posts</span>
-                </a>
-              </Link>
-            </div>
+            {hasNext && (
+              <div className={styles.loadPosts}>
+                <Link href={postsPagination.next_page}>
+                  <a>
+                    <span>Carregar mais posts</span>
+                  </a>
+                </Link>
+              </div>
+            )}
           </div>
         )}
       </main>
@@ -82,7 +88,7 @@ export const getStaticProps: GetStaticProps = async () => {
   const postsResponse = await prismic.query(
     [Prismic.predicates.at('document.type', 'post')],
     {
-      pageSize: 2,
+      pageSize: 3,
       orderings: '[document.last_publication_date desc]',
     }
   );
