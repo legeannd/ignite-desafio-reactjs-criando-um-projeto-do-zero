@@ -11,6 +11,7 @@ import { getPrismicClient } from '../services/prismic';
 
 import commonStyles from '../styles/common.module.scss';
 import styles from './home.module.scss';
+import Header from '../components/Header';
 
 interface Post {
   uid?: string;
@@ -85,7 +86,11 @@ export default function Home({
         <title>Home | spacetraveling</title>
       </Head>
 
-      <main className={styles.container}>
+      <main className={commonStyles.container}>
+        <header className={styles.headerContainer}>
+          <Header />
+        </header>
+
         {!posts ? (
           <div className={styles.singlePost}>
             <strong>Nenhum post disponível!</strong>
