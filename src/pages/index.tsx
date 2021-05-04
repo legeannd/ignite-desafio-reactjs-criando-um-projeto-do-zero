@@ -4,7 +4,7 @@ import Link from 'next/link';
 import Prismic from '@prismicio/client';
 import { FiCalendar, FiUser } from 'react-icons/fi';
 
-import { useEffect, useState } from 'react';
+import { ReactElement, useEffect, useState } from 'react';
 import { ptBR } from 'date-fns/locale';
 import { format } from 'date-fns';
 import { getPrismicClient } from '../services/prismic';
@@ -32,9 +32,7 @@ interface HomeProps {
   postsPagination: PostPagination;
 }
 
-export default function Home({
-  postsPagination,
-}: HomeProps): React.ReactElement {
+export default function Home({ postsPagination }: HomeProps): ReactElement {
   const [posts, setPosts] = useState<Post[]>();
   const [nextPage, setNextPage] = useState(postsPagination.next_page);
   const [hasNext, setHasNext] = useState(postsPagination.next_page !== null);

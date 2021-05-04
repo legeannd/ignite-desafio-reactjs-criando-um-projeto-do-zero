@@ -1,6 +1,8 @@
 import { GetStaticPaths, GetStaticProps } from 'next';
 import Prismic from '@prismicio/client';
 
+import Head from 'next/head';
+import { ReactElement } from 'react';
 import { getPrismicClient } from '../../services/prismic';
 
 import commonStyles from '../../styles/common.module.scss';
@@ -27,9 +29,14 @@ interface PostProps {
   post: Post;
 }
 
-export default function Post({ post }: PostProps) {
+export default function Post({ post }: PostProps): ReactElement {
+  console.log(post.data.content);
   return (
     <>
+      <Head>
+        <title>{post.data.title} | spacetraveling</title>
+      </Head>
+
       <div className={commonStyles.container}>{post.data.title}</div>
     </>
   );
@@ -61,7 +68,17 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   const response = await prismic.getByUID('post', String(slug), {});
 
   const post = {
-    data: response.data,
+    data: {
+      author: response.data.author,
+      banner: {
+        url: response.data.banner.url,
+      },
+      title: response.data.title,
+      content: response.data.content.map(content => ({
+        header: content.heading,
+        body: [...content.body],
+      })),
+    },
     first_publication_date: response.first_publication_date,
   } as Post;
 
