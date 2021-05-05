@@ -3,6 +3,7 @@ import Prismic from '@prismicio/client';
 
 import Head from 'next/head';
 import { ReactElement } from 'react';
+import { useRouter } from 'next/router';
 import { getPrismicClient } from '../../services/prismic';
 
 import commonStyles from '../../styles/common.module.scss';
@@ -30,7 +31,11 @@ interface PostProps {
 }
 
 export default function Post({ post }: PostProps): ReactElement {
-  console.log(post.data.content);
+  const router = useRouter();
+  if (router.isFallback) {
+    return <h1>Carregando...</h1>;
+  }
+
   return (
     <>
       <Head>
