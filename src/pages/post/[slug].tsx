@@ -4,10 +4,16 @@ import Prismic from '@prismicio/client';
 import Head from 'next/head';
 import { ReactElement } from 'react';
 import { useRouter } from 'next/router';
+import { FiCalendar, FiClock, FiUser } from 'react-icons/fi';
+
+import { RichText } from 'prismic-dom';
+import { format } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
 import { getPrismicClient } from '../../services/prismic';
 
 import commonStyles from '../../styles/common.module.scss';
 import styles from './post.module.scss';
+import Header from '../../components/Header';
 
 interface Post {
   first_publication_date: string | null;
@@ -42,7 +48,47 @@ export default function Post({ post }: PostProps): ReactElement {
         <title>{post.data.title} | spacetraveling</title>
       </Head>
 
-      <div className={commonStyles.container}>{post.data.title}</div>
+      <Header />
+
+      <div className={styles.banner}>
+        <img
+          src={post.data.banner.url}
+          alt={post.data.title}
+          width="100%"
+          height="100%"
+        />
+      </div>
+
+      <div className={commonStyles.container}>
+        <div className={styles.title}>{post.data.title}</div>
+
+        <div className={styles.info}>
+          <div className={styles.infoItens}>
+            <FiCalendar />
+            <span>{post.first_publication_date}</span>
+          </div>
+          <div className={styles.infoItens}>
+            <FiUser />
+            <span>{post.data.author}</span>
+          </div>
+          <div className={styles.infoItens}>
+            <FiClock />
+            <span>4 min</span>
+          </div>
+        </div>
+
+        {post.data.content.map(content => (
+          <article>
+            <h2>{content.heading}</h2>
+            <div
+              className={styles.content}
+              dangerouslySetInnerHTML={{
+                __html: RichText.asHtml(content.body),
+              }}
+            />
+          </article>
+        ))}
+      </div>
     </>
   );
 }
@@ -84,7 +130,13 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
         body: [...content.body],
       })),
     },
-    first_publication_date: response.first_publication_date,
+    first_publication_date: format(
+      new Date(response.first_publication_date),
+      'dd MMM yyyy',
+      {
+        locale: ptBR,
+      }
+    ),
   } as Post;
 
   return {
