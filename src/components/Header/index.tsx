@@ -7,7 +7,7 @@ export default function Header(): ReactElement {
     <div className={styles.container}>
       <Link href="/">
         <a>
-          <img src="/logo.png" alt="Spacetraveler" />
+          <img src="/logo.png" alt="logo" />
         </a>
       </Link>
     </div>

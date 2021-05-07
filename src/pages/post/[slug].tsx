@@ -42,6 +42,14 @@ export default function Post({ post }: PostProps): ReactElement {
     return <h1>Carregando...</h1>;
   }
 
+  const formattedDate = format(
+    new Date(post.first_publication_date),
+    'dd MMM yyyy',
+    {
+      locale: ptBR,
+    }
+  );
+
   const totalWords = post.data.content.reduce((acc, content) => {
     acc += content.heading.split(' ').length;
 
@@ -75,7 +83,7 @@ export default function Post({ post }: PostProps): ReactElement {
         <div className={styles.info}>
           <div className={styles.infoItens}>
             <FiCalendar />
-            <span>{post.first_publication_date}</span>
+            <span>{formattedDate}</span>
           </div>
           <div className={styles.infoItens}>
             <FiUser />
@@ -88,10 +96,8 @@ export default function Post({ post }: PostProps): ReactElement {
         </div>
 
         {post.data.content.map(content => (
-          <article>
-            <h2 key={content.heading} className={styles.heading}>
-              {content.heading}
-            </h2>
+          <article key={content.heading}>
+            <h2 className={styles.heading}>{content.heading}</h2>
             <div
               className={styles.content}
               dangerouslySetInnerHTML={{
@@ -136,20 +142,16 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
       banner: {
         url: response.data.banner.url,
       },
+      subtitle: response.data.subtitle,
       title: response.data.title,
       content: response.data.content.map(content => ({
         heading: content.heading,
         body: [...content.body],
       })),
     },
-    first_publication_date: format(
-      new Date(response.first_publication_date),
-      'dd MMM yyyy',
-      {
-        locale: ptBR,
-      }
-    ),
-  } as Post;
+    uid: response.uid,
+    first_publication_date: response.first_publication_date,
+  };
 
   return {
     props: {
