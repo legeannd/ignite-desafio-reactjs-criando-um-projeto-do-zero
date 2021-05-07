@@ -79,7 +79,9 @@ export default function Post({ post }: PostProps): ReactElement {
 
         {post.data.content.map(content => (
           <article>
-            <h2>{content.heading}</h2>
+            <h2 key={content.heading} className={styles.heading}>
+              {content.heading}
+            </h2>
             <div
               className={styles.content}
               dangerouslySetInnerHTML={{
@@ -126,7 +128,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
       },
       title: response.data.title,
       content: response.data.content.map(content => ({
-        header: content.heading,
+        heading: content.heading,
         body: [...content.body],
       })),
     },
@@ -143,6 +145,6 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
     props: {
       post,
     },
-    revalidate: 1800,
+    revalidate: 60 * 60 * 24,
   };
 };

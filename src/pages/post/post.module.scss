@@ -8,14 +8,13 @@
   margin-top: 5rem;
   margin-bottom: 1.5rem;
   width: 100%;
-  text-align: center;
+  text-align: left;
   font-size: 3rem;
   font-weight: 600;
 }
 
 .info {
   display: flex;
-  margin-bottom: 4rem;
   height: 20px;
   width: 100%;
 }
@@ -37,6 +36,15 @@
   }
 }
 
+.heading {
+  font-size: 2.25rem;
+  font-weight: bold;
+  margin: 3rem 0;
+}
+
 .content {
+  font-weight: 200;
   text-align: justify;
+  font-size: 1.125rem;
+  line-height: 1.5rem;
 }
