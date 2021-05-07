@@ -42,6 +42,16 @@ export default function Post({ post }: PostProps): ReactElement {
     return <h1>Carregando...</h1>;
   }
 
+  const totalWords = post.data.content.reduce((acc, content) => {
+    acc += content.heading.split(' ').length;
+
+    const bodyWords = content.body.map(item => item.text.split(' ').length);
+    bodyWords.map(words => (acc += words));
+    return acc;
+  }, 0);
+
+  const readingTime = Math.ceil(totalWords / 200);
+
   return (
     <>
       <Head>
@@ -73,7 +83,7 @@ export default function Post({ post }: PostProps): ReactElement {
           </div>
           <div className={styles.infoItens}>
             <FiClock />
-            <span>4 min</span>
+            <span>{readingTime} min</span>
           </div>
         </div>
 
