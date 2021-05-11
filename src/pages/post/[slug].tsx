@@ -51,9 +51,14 @@ interface PostProps {
       };
     }[];
   };
+  preview: boolean;
 }
 
-export default function Post({ post, navigation }: PostProps): ReactElement {
+export default function Post({
+  post,
+  navigation,
+  preview,
+}: PostProps): ReactElement {
   const router = useRouter();
   if (router.isFallback) {
     return <h1>Carregando...</h1>;
@@ -161,6 +166,14 @@ export default function Post({ post, navigation }: PostProps): ReactElement {
       </section>
 
       <Comments />
+
+      {preview && (
+        <aside>
+          <Link href="/api/exit-preview">
+            <a className={commonStyles.preview}>Sair do modo Preview</a>
+          </Link>
+        </aside>
+      )}
     </>
   );
 }
@@ -185,10 +198,16 @@ export const getStaticPaths: GetStaticPaths = async () => {
   };
 };
 
-export const getStaticProps: GetStaticProps = async ({ params }) => {
+export const getStaticProps: GetStaticProps = async ({
+  params,
+  preview = false,
+  previewData,
+}) => {
   const prismic = getPrismicClient();
   const { slug } = params;
-  const response = await prismic.getByUID('post', String(slug), {});
+  const response = await prismic.getByUID('post', String(slug), {
+    ref: previewData?.ref || null,
+  });
 
   const previousPost = await prismic.query(
     [Prismic.predicates.at('document.type', 'post')],
@@ -233,6 +252,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
         previousPost: previousPost?.results,
         nextPost: nextPost?.results,
       },
+      preview,
     },
     revalidate: 60 * 60 * 24,
   };
