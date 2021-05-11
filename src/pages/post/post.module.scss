@@ -55,3 +55,31 @@
   font-size: 1.125rem;
   line-height: 1.5rem;
 }
+
+.navigation {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid var(--border);
+
+  div {
+    margin-top: 3rem;
+  }
+
+  div + div {
+    text-align: right;
+  }
+
+  h3 {
+    font-size: 1.125rem;
+    font-weight: 400;
+    color: var(--heading);
+    margin-bottom: 0.5rem;
+    width: 100%;
+  }
+
+  a {
+    color: var(--highlight);
+    font-weight: 600;
+  }
+}
