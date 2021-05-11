@@ -17,6 +17,7 @@ import Header from '../../components/Header';
 
 interface Post {
   first_publication_date: string | null;
+  last_publication_date: string | null;
   data: {
     title: string;
     banner: {
@@ -41,6 +42,16 @@ export default function Post({ post }: PostProps): ReactElement {
   if (router.isFallback) {
     return <h1>Carregando...</h1>;
   }
+
+  const isEdited = post.first_publication_date !== post.last_publication_date;
+
+  const formattedEditDate = format(
+    new Date(post.last_publication_date),
+    'dd MMM yyyy',
+    {
+      locale: ptBR,
+    }
+  );
 
   const formattedDate = format(
     new Date(post.first_publication_date),
@@ -94,6 +105,11 @@ export default function Post({ post }: PostProps): ReactElement {
             <span>{readingTime} min</span>
           </div>
         </div>
+        {isEdited && (
+          <span className={styles.editDate}>
+            editado em {formattedEditDate}
+          </span>
+        )}
 
         {post.data.content.map(content => (
           <article key={content.heading}>
@@ -151,6 +167,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
     },
     uid: response.uid,
     first_publication_date: response.first_publication_date,
+    last_publication_date: response.last_publication_date,
   };
 
   return {
